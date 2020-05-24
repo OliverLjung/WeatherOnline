@@ -69,14 +69,16 @@ def menu():
         if not(reptype in ["file", "graph", "dataframe"]):
             raise ValueError
 
+        parameter = list(parameter.split(","))
+        period = time_manage(time)
+        choice(parameter, period, reptype)
+        return True
+
     except Exception:
         print("Wrong type, try again...")
         menu()
     
-    parameter = list(parameter.split(","))
-    period = time_manage(time)
-    choice(parameter, period, reptype)
-    return True
+    
 
 def time_manage(time):
     time = time.split(" to ")
@@ -98,9 +100,9 @@ def choice(para, period, reptype):
     frame = pd.DataFrame()
     for parameter in para:
         if parameter == "Sunshine procentage":
-            data = datareader.sunshine_percent(period["date_from"], period["date_to"], period["time_from"],period["time_from"])
+            data = datareader.sunshine_percent(period["date_from"], period["date_to"], period["time_from"],period["time_to"])
         else:
-            data = datareader.get_data(parameter_dict, parameter, period["date_from"], period["date_to"], period["time_from"],period["time_from"])
+            data = datareader.get_data(parameter_dict, parameter, period["date_from"], period["date_to"], period["time_from"],period["time_to"])
         frame = append_parameter_data(frame, data, parameter, para)
 
     if reptype.lower() == "file":
