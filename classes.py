@@ -106,7 +106,7 @@ class DataReader:
                         outfile.writelines(out_line)
 
 
-    def get_sunshine(self):
+    def get_sunshine(self, date_from, date_to, time_from, time_to):
         data = pd.DataFrame()
         for period in ["latest-months", "corrected-archive"]:
             url = f"https://opendata-download-metobs.smhi.se/api/version/latest/parameter/10/station/65075/period/{period}/data.csv"
@@ -119,10 +119,12 @@ class DataReader:
 
             raw = pd.read_csv(outfile, dtype= "category", sep= ",")
             temp = pd.DataFrame(raw)
-            data = data.append(temp)
+            data = data.append(temp, ignore_index=True)
             os.remove(infile)
-            os.remove(outfile)
 
+        os.remove(outfile)
+        data = self.periodize(data, date_from, date_to, time_from, time_to)
+        data = self.fill_blanks(data, "Solskenstid")
 
         return data
 
@@ -199,13 +201,16 @@ class DataReader:
                 return index
 
     def sunshine_percent(self, date_from, date_to, time_from, time_to):
-        data = self.get_sunshine()
+        data = self.get_sunshine(date_from, date_to, time_from, time_to)
         start = self.find_row(date_from, time_from, data)
         end = self.find_row(date_to, time_to, data)
         solsken_toint = data.loc[start:end, 'Solskenstid'].astype('int64')
         sum_is = solsken_toint.sum(axis = 0)
         total_sum = (end - start + 1) * 3600
         percent = (sum_is / total_sum) * 100
-        return percent
+        
+        data = {'Sunshine Procentage':[percent]} 
+        df = pd.DataFrame(data)
+        return df
 
         

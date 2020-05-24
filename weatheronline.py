@@ -33,7 +33,7 @@ parameter_dict = {
             "Molnbas":28,
             "Molnmängd":29,
             "Daggpunktstemperatur":39,
-            "Sunshine procentage": None
+            "Solskenstid":None
         }
 
 timereader = classes.TimeReader()
@@ -52,10 +52,13 @@ def menu():
         print("1. Enter Parameters (comma-separated) from available: ")
         for para in parameter_dict.keys():
             print(para)
-        parameter = input("or Sunshine procentage: ")
+        parameter = input("or only Solskensprocent (dataframe): ")
         if "exit" == parameter.lower():
             return False
         for para in parameter.split(","):
+            if para == "solskensprocent":
+                if len(parameter.split(",")) > 1:
+                    raise ValueError
             if para not in parameter_dict.keys():
                 raise ValueError
         time = input("2. Enter timeperiod (yyyy-mm-dd hh:mm to yyyy-mm-dd hh:mm):")
@@ -99,8 +102,13 @@ def choice(para, period, reptype):
     print("Loading data, may take a while...")
     frame = pd.DataFrame()
     for parameter in para:
-        if parameter == "Sunshine procentage":
+        if parameter == "Solskensprocent":
             data = datareader.sunshine_percent(period["date_from"], period["date_to"], period["time_from"],period["time_to"])
+            frame = append_parameter_data(frame, data, parameter, para)
+            reptype = "dataframe"
+            break
+        elif parameter == "Solskenstid":
+            data = datareader.get_sunshine(period["date_from"], period["date_to"], period["time_from"],period["time_to"])
         else:
             data = datareader.get_data(parameter_dict, parameter, period["date_from"], period["date_to"], period["time_from"],period["time_to"])
         frame = append_parameter_data(frame, data, parameter, para)
@@ -112,7 +120,7 @@ def choice(para, period, reptype):
         except FileNotFoundError:
             frame.to_csv("data.xls", index=False)
     elif reptype.lower() == "graph":
-        graphdrawer.to_graph_multiple(frame)
+        graphdrawer.to_graph(frame)
     elif reptype.lower() == "dataframe":
         print(frame)
 
