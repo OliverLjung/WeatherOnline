@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 import urllib.request
+import time
 
 # For rhe graphs
 import plotly.express as px
