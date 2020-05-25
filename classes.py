@@ -12,10 +12,11 @@ import urllib.request
 
 
 class GraphDrawer:
-    def to_graph(df):
+    def to_graph(self, df):
         df["Date"] = df["Datum"].astype(str) + " " + df["Tid (UTC)"].astype(str)
         df_long=pd.melt(df, id_vars=['Date'], value_vars=[df.columns[x] for x in range(2,len(list(df.columns.values))-1)])
         fig = px.line(df_long, x='Date', y='value', color='variable')
+        fig.show()
 
 class TimeReader:
     def clock(self):

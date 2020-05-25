@@ -9,10 +9,6 @@ import pandas as pd
 import os
 import urllib.request
 
-# For the gui
-import pygame
-import time
-
 # For rhe graphs
 import plotly.express as px
 
